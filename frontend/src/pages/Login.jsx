@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { loginUser } from "../api";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -25,19 +26,26 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 shadow-lg rounded-lg">
-        <h2 className="text-2xl font-semibold text-center text-gray-700 mb-6">Login</h2>
-        
-        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md bg-white/20 backdrop-blur-lg p-8 shadow-lg rounded-2xl border border-white/30"
+      >
+        <h2 className="text-3xl font-bold text-center text-white mb-6">
+          Welcome Back👋
+        </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <input
               type="text"
               name="username"
               placeholder="Username"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              className="w-full px-4 py-3 bg-white/20 border border-white/40 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-white outline-none"
               onChange={handleChange}
               required
             />
@@ -47,26 +55,28 @@ const Login = () => {
               type="password"
               name="password"
               placeholder="Password"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              className="w-full px-4 py-3 bg-white/20 border border-white/40 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-white outline-none"
               onChange={handleChange}
               required
             />
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
+            className="w-full bg-white/30 text-white py-3 rounded-lg font-semibold hover:bg-white/40 transition-all shadow-md"
           >
             Login
-          </button>
+          </motion.button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
+        <p className="text-center text-sm text-white mt-4">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline">
+          <a href="/register" className="text-white font-semibold hover:underline">
             Register here
           </a>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };

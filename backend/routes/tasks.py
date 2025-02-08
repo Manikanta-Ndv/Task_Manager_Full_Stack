@@ -16,6 +16,7 @@ class TaskCreate(BaseModel):
     description: Optional[str] = None
     priority: str  # "low", "medium", "high"
     due_date: datetime  # Expecting datetime in UTC format
+    assigned_to : str
     completed: Optional[bool] = False
 
     @validator("due_date", pre=True)
@@ -44,6 +45,7 @@ async def create_task(task: TaskCreate):
     task_data["due_date"] = task.due_date  # Ensure it's a Python datetime
     task_data["_id"] = ObjectId()  # Generate a unique ObjectId
     task_data["completed"] = task.completed  # ✅ Ensure completed is stored
+    task_data["assigned_to"] = task.assigned_to
 
     result = await tasks_collection.insert_one(task_data)
     

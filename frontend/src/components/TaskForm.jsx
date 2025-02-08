@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const TaskForm = ({ refreshTasks }) => {
     const [title, setTitle] = useState("");
@@ -16,19 +17,11 @@ const TaskForm = ({ refreshTasks }) => {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await axios.post(
+            await axios.post(
                 "http://localhost:8000/tasks/",
-                {
-                    title,
-                    description,
-                    priority,
-                    due_date: dueDate,
-                    assigned_to: assignedTo
-                },
+                { title, description, priority, due_date: dueDate, assigned_to: assignedTo },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
-            console.log("Task created:", response.data);
 
             // Reset form fields
             setTitle("");
@@ -47,70 +40,92 @@ const TaskForm = ({ refreshTasks }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white p-6 shadow-lg rounded-md">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Create New Task</h2>
+        <motion.form
+            onSubmit={handleSubmit}
+            className="bg-white/30 backdrop-blur-md p-6 shadow-lg rounded-2xl border border-white/30 max-w-lg mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
+            <h2 className="text-2xl font-semibold text-gray-800 text-center mb-5"> Create a New Task</h2>
 
             {/* Title */}
-            <input
-                type="text"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                className="w-full p-2 border rounded mb-3"
-            />
+            <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">Task Title</label>
+                <input
+                    type="text"
+                    placeholder="Enter task title..."
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                    className="w-full p-3 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+            </div>
 
             {/* Description */}
-            <textarea
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-                className="w-full p-2 border rounded mb-3"
-            />
+            <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">Description</label>
+                <textarea
+                    placeholder="Enter task description..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                    rows={3}
+                    className="w-full p-3 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+            </div>
 
             {/* Priority Dropdown */}
-            <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-                required
-                className="w-full p-2 border rounded mb-3"
-            >
-                <option value="High"> High</option>
-                <option value="Medium"> Medium</option>
-                <option value="Low"> Low</option>
-            </select>
+            <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">Priority</label>
+                <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    required
+                    className="w-full p-3 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                    <option value="High"> High</option>
+                    <option value="Medium"> Medium</option>
+                    <option value="Low"> Low</option>
+                </select>
+            </div>
 
             {/* Due Date */}
-            <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                required
-                className="w-full p-2 border rounded mb-3"
-            />
+            <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">Due Date</label>
+                <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    required
+                    className="w-full p-3 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+            </div>
 
             {/* Assigned To */}
-            <input
-                type="text"
-                placeholder="Assign to (email or name)"
-                value={assignedTo}
-                onChange={(e) => setAssignedTo(e.target.value)}
-                required
-                className="w-full p-2 border rounded mb-3"
-            />
+            <div className="mb-6">
+                <label className="block text-gray-700 font-medium mb-2">Assign To</label>
+                <input
+                    type="text"
+                    placeholder="Enter email or name..."
+                    value={assignedTo}
+                    onChange={(e) => setAssignedTo(e.target.value)}
+                    required
+                    className="w-full p-3 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+            </div>
 
             {/* Submit Button */}
-            <button
+            <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full p-2 text-white font-semibold rounded transition-all ${
-                    isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-                }`}
+                className="w-full p-3 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition-all"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
             >
                 {isSubmitting ? "Creating..." : "Create Task"}
-            </button>
-        </form>
+            </motion.button>
+        </motion.form>
     );
 };
 
