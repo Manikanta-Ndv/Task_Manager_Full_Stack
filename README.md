@@ -59,7 +59,7 @@ npm install
 # Start the React development server
 npm start
 ```
-- The React app should now be running at `http://localhost:3000`
+- The React app should now be running at `http://localhost:5173`
 
 ---
 
