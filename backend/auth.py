@@ -6,53 +6,26 @@ from utils import SECRET_KEY, ALGORITHM
 from bson import ObjectId
 from database import users_collection
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-# def get_current_user(token: str = Security(oauth2_scheme)):
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         user_id = payload.get("sub")
-
-#         if not user_id:
-#             raise HTTPException(status_code=401, detail="Invalid token")
-
-#         user = db.users.find_one({"_id": ObjectId(user_id)})
-#         if not user:
-#             raise HTTPException(status_code=401, detail="User not found")
-
-#         return user
-#     except JWTError:
-#         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-# def get_current_user(token: str = Depends(oauth2_scheme)):
-#     if not token:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-#     return {"user": "authenticated_user"}  # Dummy example
-
-# async def get_current_user(token: str = Depends(oauth2_scheme)):
-#     """Fetch user from DB based on token (Dummy Example)"""
-#     user = await users_collection.find_one({"token": token})  # Replace with actual user lookup
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    
-#     # ✅ Return user object (including _id)
-#     return user
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login") 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No token provided")
-    
+
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        user_id = payload.get("sub")  # ✅ Use "sub" instead of "_id"
+        token = token.replace("Bearer ", "")  # Ensure correct token format
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        role: str = payload.get("role")
 
-        if not user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token: No user ID")
+        if not username or not role:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token structure")
 
-        return {"_id": user_id}  # ✅ Fix KeyError by returning "_id"
+        user = users_collection.find_one({"username": username})
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found in database")
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
-    
-    except jwt.InvalidTokenError:
+        return {"username": username, "role": role}
+
+    except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")

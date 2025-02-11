@@ -1,7 +1,10 @@
 fastapi
 uvicorn
 pydantic
-motor  
-python-dotenv  
-pyjwt  
-bcrypt 
+pymongo
+motor
+python-dotenv
+passlib[bcrypt]
+pyjwt
+bcrypt
+python-multipart

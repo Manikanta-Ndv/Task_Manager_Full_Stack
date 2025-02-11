@@ -3,14 +3,23 @@ import { AuthProvider, AuthContext } from "../src/context/AuthContext";
 import { useContext } from "react";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import UserDashboard from "./pages/UserDashboard";
 import Navbar from "./components/Navbar";
-import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 
-const ProtectedRoute = ({ children }) => {
-  const { user } = useContext(AuthContext);
-  return user ? children : <Navigate to="/login" />;
+const PrivateRoute = ({ element, allowedRoles }) => {
+  const { token, userRole } = useContext(AuthContext);
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/" />;
+  }
+
+  return element;
 };
 
 function App() {
@@ -20,10 +29,22 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+
+          {/* Role-based dashboard redirection */}
+          <Route path="/dashboard" element={
+            <PrivateRoute 
+              element={localStorage.getItem("role") === "superuser" ? <AdminDashboard /> : <UserDashboard />}
+            />
+          } />
+
+          {/* Specific Dashboards */}
+          <Route path="/admin-dashboard" element={<PrivateRoute element={<AdminDashboard />} allowedRoles={["superuser"]} />} />
+          <Route path="/user-dashboard" element={<PrivateRoute element={<UserDashboard />} allowedRoles={["user"]} />} />
+
+          {/* Catch-All Redirect */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
     </AuthProvider>

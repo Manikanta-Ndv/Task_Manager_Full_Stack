@@ -25,9 +25,11 @@ class TaskCreate(BaseModel):
     title: str = Field(..., min_length=3, max_length=100)
     description: Optional[str] = None
     priority: str = Field(default="medium", pattern="^(low|medium|high)$")
-    due_date: Optional[datetime] = datetime.utcnow() 
-    assigned_to: Optional[str] = None
+    due_date: Optional[datetime] = None
+    assigned_to: str = Field(..., min_length=3, max_length=50)
     completed: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     @validator("due_date")
     def validate_due_date(cls, value):
@@ -40,4 +42,8 @@ class TaskResponse(BaseModel):
     title: str
     description: str
     priority: str
-    due_date: datetime
+    due_date: Optional[datetime]
+    assigned_to: str
+    completed: bool
+    created_at: datetime
+    updated_at: datetime
